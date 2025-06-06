@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Monitoreo Saludable</string>
+
+    <string name="hint_peso">Ingrese su peso (kg)</string>
+    <string name="hint_edad">Ingrese su edad</string>
+    <string name="hint_pasos">Cantidad de pasos</string>
+    <string name="hint_frecuencia">Frecuencia cardíaca</string>
+
+    <string name="btn_calcular">Calcular</string>
+    <string name="btn_guardar">Guardar</string>
+    <string name="btn_eliminar">Eliminar</string>
+    <string name="btn_listar">Listar</string>
+    <string name="rb_masculino">Masculino</string>
+    <string name="rb_femenino">Femenino</string>
+    <string name="error_peso">Ingrese su peso</string>
+    <string name="error_edad">Ingrese su edad</string>
+    <string name="error_sexo">Seleccione su sexo</string>
+    <string name="error_pasos">Ingrese los pasos</string>
+    <string name="error_frecuencia">Ingrese la frecuencia cardíaca</string>
+
+
+    <string name="toast_guardado">Monitoreo guardado</string>
+    <string name="toast_eliminado">Último monitoreo eliminado</string>
+    <string name="toast_no_eliminar">No hay registros para eliminar</string>
+
+    <string name="no_hay_registros">No hay registros guardados.</string>
+
+
+    <string name="label_resumen">Resumen del monitoreo</string>
+</resources>
