@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#E3F2FD"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="24dp">
+
+        <EditText
+            android:id="@+id/etNombrePaciente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre del paciente"
+            android:inputType="textPersonName"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:id="@+id/tvTitulo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Calcular Calorías Quemadas"
-            android:textSize="24sp"
+            android:text="Ingrese sus datos de salud"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:gravity="center"
+            android:textColor="#000000"
             android:layout_marginBottom="16dp" />
 
         <EditText
@@ -89,8 +100,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="24dp"
-            android:visibility="gone">
+            android:layout_marginTop="24dp">
 
             <Button
                 android:id="@+id/btnGuardar"
@@ -118,5 +128,23 @@
                 android:backgroundTint="#2196F3"
                 android:textColor="#FFFFFF" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnTotalEvaluados"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ver Total Evaluados"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#FFC107"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/tvTotalEvaluados"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:textColor="#000000" />
     </LinearLayout>
 </ScrollView>

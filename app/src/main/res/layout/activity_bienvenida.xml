@@ -1,49 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
     android:background="#E3F2FD">
 
-    <LinearLayout
+    <!-- Título principal -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bienvenido a su monitoreo saludable"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#0D47A1"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Imagen decorativa debajo del título -->
+    <ImageView
+        android:id="@+id/ivImagenSalud"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/salud_icon"
+    android:layout_marginBottom="24dp"
+    android:contentDescription="Imagen de salud" />
+
+    <!-- Campo de nombre del paciente -->
+    <EditText
+        android:id="@+id/etNombrePaciente"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
+        android:hint="Ingrese su nombre"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="16dp" />
 
-        <TextView
-            android:id="@+id/tvBienvenida"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:text="¡Bienvenido a Monitoreo Saludable!"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+    <!-- Botón para continuar -->
+    <Button
+        android:id="@+id/btnEmpecemos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Empecemos"
+        android:backgroundTint="#1976D2"
+        android:textColor="@android:color/white" />
 
-        <ImageView
-            android:id="@+id/ivLogo"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_marginBottom="24dp"
-            android:src="@drawable/salud"
-            android:scaleType="fitCenter" />
-
-        <EditText
-            android:id="@+id/etNombrePaciente"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Ingrese su nombre"
-            android:inputType="textPersonName"
-            android:layout_marginBottom="24dp" />
-
-        <Button
-            android:id="@+id/btnEmpecemos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Empecemos"
-            android:backgroundTint="@android:color/holo_blue_light"
-            android:textColor="@android:color/white"
-            android:textAllCaps="false" />
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

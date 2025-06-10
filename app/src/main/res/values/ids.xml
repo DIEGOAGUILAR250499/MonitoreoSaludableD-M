@@ -2,4 +2,6 @@
 <resources>
     <item name="mainLayout" type="id" />
     <item name="etNombre" type="id" />
+    <item name="etNombrePaciente" type="id" />
+    <item name="btnEmpecemos" type="id" />
 </resources>

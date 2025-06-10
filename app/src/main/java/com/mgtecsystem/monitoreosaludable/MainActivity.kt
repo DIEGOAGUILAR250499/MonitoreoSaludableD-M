@@ -1,14 +1,17 @@
 package com.mgtecsystem.monitoreosaludable
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var etNombrePaciente: EditText
     private lateinit var etPeso: EditText
     private lateinit var etEdad: EditText
     private lateinit var rgSexo: RadioGroup
@@ -20,18 +23,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnGuardar: Button
     private lateinit var btnEliminar: Button
     private lateinit var btnListar: Button
+    private lateinit var btnTotalEvaluados: Button
+    private lateinit var tvTotalEvaluados: TextView
     private lateinit var layoutBotonesCrud: LinearLayout
 
     private val listaMonitoreos = mutableListOf<String>()
-    private var nombrePaciente: String = ""
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        nombrePaciente = intent.getStringExtra("nombrePaciente") ?: "Paciente"
-
+        etNombrePaciente = findViewById(R.id.etNombrePaciente)
         etPeso = findViewById(R.id.etPeso)
         etEdad = findViewById(R.id.etEdad)
         rgSexo = findViewById(R.id.rgSexo)
@@ -43,8 +45,10 @@ class MainActivity : AppCompatActivity() {
         btnGuardar = findViewById(R.id.btnGuardar)
         btnEliminar = findViewById(R.id.btnEliminar)
         btnListar = findViewById(R.id.btnListar)
+        btnTotalEvaluados = findViewById(R.id.btnTotalEvaluados)
+        tvTotalEvaluados = findViewById(R.id.tvTotalEvaluados)
+
         layoutBotonesCrud = findViewById(R.id.layoutBotonesCrud)
-        layoutBotonesCrud.visibility = View.VISIBLE
 
         btnCalcular.setOnClickListener {
             if (validarEntradas()) {
@@ -77,15 +81,30 @@ class MainActivity : AppCompatActivity() {
                 listaMonitoreos.joinToString("\n\n")
             }
         }
+
+        btnTotalEvaluados.setOnClickListener {
+            val total = listaMonitoreos.size
+            tvTotalEvaluados.text = "Total de personas evaluadas: $total"
+        }
     }
 
     private fun validarEntradas(): Boolean {
+        if (etNombrePaciente.text.isBlank()) return mostrarError("Ingrese el nombre del paciente")
         if (etPeso.text.isBlank()) return mostrarError("Ingrese su peso")
         if (etEdad.text.isBlank()) return mostrarError("Ingrese su edad")
         if (rgSexo.checkedRadioButtonId == -1) return mostrarError("Seleccione su sexo")
         if (etPasos.text.isBlank()) return mostrarError("Ingrese los pasos")
         if (etFrecuencia.text.isBlank()) return mostrarError("Ingrese la frecuencia cardíaca")
-        return true
+
+        return try {
+            etPeso.text.toString().toDouble()
+            etEdad.text.toString().toInt()
+            etPasos.text.toString().toInt()
+            etFrecuencia.text.toString().toInt()
+            true
+        } catch (e: Exception) {
+            mostrarError("Verifique los datos ingresados")
+        }
     }
 
     private fun mostrarError(mensaje: String): Boolean {
@@ -97,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         return when (rgSexo.checkedRadioButtonId) {
             R.id.rbMasculino -> "Masculino"
             R.id.rbFemenino -> "Femenino"
-            else -> "Desconocido"
+            else -> "No especificado"
         }
     }
 
@@ -107,6 +126,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun obtenerResumen(): String {
+        val nombre = etNombrePaciente.text.toString()
         val peso = etPeso.text.toString().toDouble()
         val edad = etEdad.text.toString().toInt()
         val sexo = obtenerSexo()
@@ -114,8 +134,15 @@ class MainActivity : AppCompatActivity() {
         val frecuencia = etFrecuencia.text.toString().toInt()
         val calorias = calcularCalorias(peso, pasos, sexo)
 
+        val sdfFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val sdfHora = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val fecha = sdfFecha.format(Date())
+        val hora = sdfHora.format(Date())
+
         return """
-            Nombre: $nombrePaciente
+            Nombre: $nombre
+            Fecha del cálculo: $fecha
+            Hora del cálculo: $hora
             Peso: $peso kg
             Edad: $edad años
             Sexo: $sexo
@@ -131,7 +158,6 @@ class MainActivity : AppCompatActivity() {
             val y = event.y
             val screenHeight = resources.displayMetrics.heightPixels
 
-            Toast.makeText(this, "Toque en x: $x, y: $y", Toast.LENGTH_SHORT).show()
             if (x < 200 && y > screenHeight - 200) {
                 layoutBotonesCrud.visibility =
                     if (layoutBotonesCrud.visibility == View.GONE) View.VISIBLE else View.GONE
@@ -140,3 +166,5 @@ class MainActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 }
+
+
