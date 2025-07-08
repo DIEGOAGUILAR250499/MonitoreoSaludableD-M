@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.mgtecsystem.monitoreosaludable">
 
     <application
@@ -9,11 +10,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MonitoreoSaludable">
 
+        <activity android:name=".GraficoManualActivity"
+            tools:ignore="MissingClass" />
+
         <activity android:name=".MainActivity" android:exported="true" />
+
         <activity android:name=".WelcomeActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+
+
+
             </intent-filter>
         </activity>
 

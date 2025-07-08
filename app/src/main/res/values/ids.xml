@@ -4,4 +4,11 @@
     <item name="etNombre" type="id" />
     <item name="etNombrePaciente" type="id" />
     <item name="btnEmpecemos" type="id" />
+    <item name="tvNombreEncabezado" type="id" />
+    <item name="layoutNombresRegistrados" type="id" />
+    <item name="btnBorrarTodo" type="id" />
+    <item name="layoutBotonesCrud" type="id" />
+    <item name="tvPromedio" type="id" />
+    <item name="etBuscarNombre" type="id" />
+    <item name="customBarChartView" type="id" />
 </resources>

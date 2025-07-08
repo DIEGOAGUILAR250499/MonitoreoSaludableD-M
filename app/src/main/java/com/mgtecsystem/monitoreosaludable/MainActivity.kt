@@ -1,170 +1,142 @@
 package com.mgtecsystem.monitoreosaludable
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var etNombrePaciente: EditText
     private lateinit var etPeso: EditText
     private lateinit var etEdad: EditText
-    private lateinit var rgSexo: RadioGroup
     private lateinit var etPasos: EditText
     private lateinit var etFrecuencia: EditText
-    private lateinit var btnCalcular: Button
     private lateinit var tvResumen: TextView
 
-    private lateinit var btnGuardar: Button
-    private lateinit var btnEliminar: Button
-    private lateinit var btnListar: Button
-    private lateinit var btnTotalEvaluados: Button
-    private lateinit var tvTotalEvaluados: TextView
-    private lateinit var layoutBotonesCrud: LinearLayout
-
-    private val listaMonitoreos = mutableListOf<String>()
+    private val evaluaciones = arrayListOf<Evaluacion>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Referencias de UI
         etNombrePaciente = findViewById(R.id.etNombrePaciente)
         etPeso = findViewById(R.id.etPeso)
         etEdad = findViewById(R.id.etEdad)
-        rgSexo = findViewById(R.id.rgSexo)
         etPasos = findViewById(R.id.etPasos)
         etFrecuencia = findViewById(R.id.etFrecuencia)
-        btnCalcular = findViewById(R.id.btnCalcular)
         tvResumen = findViewById(R.id.tvResumen)
 
-        btnGuardar = findViewById(R.id.btnGuardar)
-        btnEliminar = findViewById(R.id.btnEliminar)
-        btnListar = findViewById(R.id.btnListar)
-        btnTotalEvaluados = findViewById(R.id.btnTotalEvaluados)
-        tvTotalEvaluados = findViewById(R.id.tvTotalEvaluados)
+        val btnAcciones = findViewById<Button>(R.id.btnAcciones)
+        val btnVerGrafico = findViewById<Button>(R.id.btnVerGrafico)
+        val btnCalcular = findViewById<Button>(R.id.btnCalcular)
 
-        layoutBotonesCrud = findViewById(R.id.layoutBotonesCrud)
+        // ✅ Recibir nombre del paciente desde WelcomeActivity
+        val nombrePaciente = intent.getStringExtra("nombrePaciente")
+        if (!nombrePaciente.isNullOrEmpty()) {
+            etNombrePaciente.setText(nombrePaciente)
+        }
 
-        btnCalcular.setOnClickListener {
-            if (validarEntradas()) {
-                val resumen = obtenerResumen()
-                tvResumen.text = resumen
+        btnCalcular.setOnClickListener { calcular() }
+
+        btnAcciones.setOnClickListener {
+            val popup = PopupMenu(this, btnAcciones)
+            popup.menuInflater.inflate(R.menu.menu_crud, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_guardar -> guardarDatos()
+                    R.id.menu_eliminar -> eliminarTodo()
+                }
+                true
             }
+            popup.show()
         }
 
-        btnGuardar.setOnClickListener {
-            if (validarEntradas()) {
-                val resumen = obtenerResumen()
-                listaMonitoreos.add(resumen)
-                Toast.makeText(this, "Monitoreo guardado", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        btnEliminar.setOnClickListener {
-            if (listaMonitoreos.isNotEmpty()) {
-                listaMonitoreos.removeAt(listaMonitoreos.size - 1)
-                Toast.makeText(this, "Último monitoreo eliminado", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "No hay registros para eliminar", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        btnListar.setOnClickListener {
-            tvResumen.text = if (listaMonitoreos.isEmpty()) {
-                "No hay registros guardados."
-            } else {
-                listaMonitoreos.joinToString("\n\n")
-            }
-        }
-
-        btnTotalEvaluados.setOnClickListener {
-            val total = listaMonitoreos.size
-            tvTotalEvaluados.text = "Total de personas evaluadas: $total"
+        btnVerGrafico.setOnClickListener {
+            val intent = Intent(this, GraficoManualActivity::class.java)
+            intent.putExtra("evaluaciones", ArrayList(evaluaciones))
+            startActivity(intent)
         }
     }
 
-    private fun validarEntradas(): Boolean {
-        if (etNombrePaciente.text.isBlank()) return mostrarError("Ingrese el nombre del paciente")
-        if (etPeso.text.isBlank()) return mostrarError("Ingrese su peso")
-        if (etEdad.text.isBlank()) return mostrarError("Ingrese su edad")
-        if (rgSexo.checkedRadioButtonId == -1) return mostrarError("Seleccione su sexo")
-        if (etPasos.text.isBlank()) return mostrarError("Ingrese los pasos")
-        if (etFrecuencia.text.isBlank()) return mostrarError("Ingrese la frecuencia cardíaca")
+    private fun calcular() {
+        val nombre = etNombrePaciente.text.toString().trim()
+        val peso = etPeso.text.toString().toDoubleOrNull()
+        val edad = etEdad.text.toString().toIntOrNull()
+        var pasos = etPasos.text.toString().toIntOrNull()
+        var frecuencia = etFrecuencia.text.toString().toIntOrNull()
 
-        return try {
-            etPeso.text.toString().toDouble()
-            etEdad.text.toString().toInt()
-            etPasos.text.toString().toInt()
-            etFrecuencia.text.toString().toInt()
-            true
-        } catch (e: Exception) {
-            mostrarError("Verifique los datos ingresados")
+        if (nombre.isEmpty() || peso == null || edad == null) {
+            Toast.makeText(this, "Ingresa nombre, peso y edad", Toast.LENGTH_SHORT).show()
+            return
         }
-    }
 
-    private fun mostrarError(mensaje: String): Boolean {
-        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
-        return false
-    }
-
-    private fun obtenerSexo(): String {
-        return when (rgSexo.checkedRadioButtonId) {
-            R.id.rbMasculino -> "Masculino"
-            R.id.rbFemenino -> "Femenino"
-            else -> "No especificado"
+        if (pasos == null) {
+            pasos = (3000..8000).random()
+            etPasos.setText(pasos.toString())
         }
-    }
 
-    private fun calcularCalorias(peso: Double, pasos: Int, sexo: String): Double {
-        val coef = if (sexo == "Masculino") 0.05 else 0.04
-        return pasos * coef
-    }
+        if (frecuencia == null) {
+            frecuencia = (60..100).random()
+            etFrecuencia.setText(frecuencia.toString())
+        }
 
-    private fun obtenerResumen(): String {
-        val nombre = etNombrePaciente.text.toString()
-        val peso = etPeso.text.toString().toDouble()
-        val edad = etEdad.text.toString().toInt()
-        val sexo = obtenerSexo()
-        val pasos = etPasos.text.toString().toInt()
-        val frecuencia = etFrecuencia.text.toString().toInt()
-        val calorias = calcularCalorias(peso, pasos, sexo)
-
-        val sdfFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val sdfHora = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-        val fecha = sdfFecha.format(Date())
-        val hora = sdfHora.format(Date())
-
-        return """
+        val calorias = (peso * 0.5) + (pasos * 0.02) + (frecuencia * 0.1)
+        val resumen = """
             Nombre: $nombre
-            Fecha del cálculo: $fecha
-            Hora del cálculo: $hora
             Peso: $peso kg
             Edad: $edad años
-            Sexo: $sexo
             Pasos: $pasos
-            Frecuencia cardíaca: $frecuencia bpm
-            Calorías quemadas: ${"%.2f".format(calorias)} kcal
-        """.trimIndent()
+            Frecuencia: $frecuencia bpm
+            Calorías estimadas: %.2f
+        """.trimIndent().format(calorias)
+
+        tvResumen.text = resumen
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            val x = event.x
-            val y = event.y
-            val screenHeight = resources.displayMetrics.heightPixels
+    private fun guardarDatos() {
+        val nombre = etNombrePaciente.text.toString().trim()
+        val peso = etPeso.text.toString().toDoubleOrNull()
+        val edad = etEdad.text.toString().toIntOrNull()
+        val pasos = etPasos.text.toString().toIntOrNull()
+        val frecuencia = etFrecuencia.text.toString().toIntOrNull()
 
-            if (x < 200 && y > screenHeight - 200) {
-                layoutBotonesCrud.visibility =
-                    if (layoutBotonesCrud.visibility == View.GONE) View.VISIBLE else View.GONE
-            }
+        if (nombre.isEmpty() || peso == null || edad == null || pasos == null || frecuencia == null) {
+            Toast.makeText(this, "Completa todos los campos correctamente para guardar", Toast.LENGTH_SHORT).show()
+            return
         }
-        return super.onTouchEvent(event)
+
+        val calorias = (peso * 0.5) + (pasos * 0.02) + (frecuencia * 0.1)
+        val fechaHora = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        val evaluacion = Evaluacion(nombre, peso, edad, pasos, frecuencia, calorias, fechaHora)
+        evaluaciones.add(evaluacion)
+
+        tvResumen.text = """
+            Guardado:
+            Nombre: $nombre
+            Peso: %.2f kg
+            Edad: $edad años
+            Pasos: $pasos
+            Frecuencia: $frecuencia bpm
+            Calorías: %.2f
+            Fecha: $fechaHora
+        """.trimIndent().format(peso, calorias)
+
+        Toast.makeText(this, "Evaluación guardada", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun eliminarTodo() {
+        evaluaciones.clear()
+        Toast.makeText(this, "Todos los datos fueron eliminados", Toast.LENGTH_SHORT).show()
+        tvResumen.text = ""
+        etNombrePaciente.text.clear()
+        etPeso.text.clear()
+        etEdad.text.clear()
+        etPasos.text.clear()
+        etFrecuencia.text.clear()
     }
 }
-
-
